@@ -1,0 +1,8 @@
+{
+	"name": "devicemanager-middle",
+	"config" : {
+		"logLevel": "tiny",
+		"port": 9090
+	}
+}
+		

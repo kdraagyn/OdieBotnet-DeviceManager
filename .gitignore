@@ -1,0 +1,6 @@
+# npm ignore files and directories
+bin/
+node_modules/
+
+# vim ignore files
+*.swp

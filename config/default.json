@@ -1,0 +1,21 @@
+{
+	"name": "devicemanager-middle",
+	"config": {
+		"rest": {
+			"port": 8080
+		},
+		"websocket": {
+			"port": 8080
+		},
+		"udp": {
+			"port": 8081
+		},
+		"logLevel": "dev"
+	},
+	"morgan": {
+		"options": {
+			"stream": "log.txt"
+		}
+	}
+}
+		
