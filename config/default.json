@@ -2,13 +2,13 @@
 	"name": "devicemanager-middle",
 	"config": {
 		"rest": {
-			"port": 8080
+			"port": 8081
 		},
 		"websocket": {
-			"port": 8080
+			"port": 8081
 		},
 		"udp": {
-			"port": 8081
+			"port": 8080
 		},
 		"logLevel": "dev"
 	},

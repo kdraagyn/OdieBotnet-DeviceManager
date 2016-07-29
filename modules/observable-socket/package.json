@@ -1,0 +1,11 @@
+{
+  "name": "observable-socket",
+  "version": "0.0.0",
+  "description": "wraps a socket connection to emit on incoming events and allow for messages to continue to be sent out using the same websocket interface",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Keith Nygaard",
+  "license": "ISC"
+}
