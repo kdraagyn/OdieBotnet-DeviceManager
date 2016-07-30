@@ -56,7 +56,7 @@ router.get('/getDevices', function(req, res, next) {
 	res.json(Object.keys( deviceIdToSocket ) );
 });
 
-router.ws('/ws/', function(ws, req) {
+router.ws('/ws', function(ws, req) {
 
 	ws.on('message', function(msg) {
 		var requestJson = JSON.parse(msg);
@@ -91,7 +91,7 @@ udpServer.on('error', function(error) {
 udpServer.on('message', function(message, rinfo) {
 	var responseObject = {};
 	responseObject['port'] = WS_LISTENING_PORT;
-	responseObject['path'] = 'device/ws';
+	responseObject['path'] = '/device/ws';
 
 	// assign unique ID
 	if( availableDeviceIds.length < 1 ) {
