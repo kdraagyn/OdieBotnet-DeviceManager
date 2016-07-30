@@ -7,13 +7,13 @@
  **/
 var Rx = require('rx');
 
-var observableSocket = (function( ws ) {
+var observableSocket = (function( ws, onDeviceCloseFunc ) {
 	
 	var observable = Rx.Observable.create(function (obs) {
 		// Handle messages  
 		ws.onmessage = obs.onNext.bind(obs);
 		ws.onerror = obs.onError.bind(obs);
-		ws.onclose = obs.onCompleted.bind(obs);
+		ws.onclose = onDeviceCloseFunc;
 
 		// Return way to unsubscribe
 		return ws.close.bind(ws);

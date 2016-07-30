@@ -15,6 +15,8 @@ var webSocketObservable = Rx.Observable.create( function( observer ) {});
 var webSocketSubject = new Rx.Subject();
 
 var deviceIdToSocket = {};
+var availableDeviceIds = [];
+var deviceIdPointer = 0;
 
 router.post('/:deviceId', function(req, res, next) {
 	var deviceId = req.params.deviceId;
@@ -35,7 +37,9 @@ router.post('/:deviceId', function(req, res, next) {
 		connection.send( JSON.stringify( request) );
 
 		// react to message coming back from device
-		var restSubject = webSocketSubject.subscribe( function(e) {
+		var restSubject = webSocketSubject.filter( function(message) { 
+			return message.data.id != deviceId;
+		}).subscribe( function(e) {
 			response[ 'status' ] = 'success';
 			response[ 'message' ] = "Sent message to device";
 			response[ 'payload' ] = e.data;
@@ -60,8 +64,11 @@ router.ws('/ws/', function(ws, req) {
 		var deviceId = requestJson[ "id" ];
 		var payload = requestJson['payload'];
 
-		if( !(deviceId in deviceIdToSocket ) ) {
-			var obsSock = observableSocket( ws );
+		if( !( deviceId in deviceIdToSocket ) ) {
+			var obsSock = observableSocket( ws, function() {
+				delete deviceIdToSocket[ deviceId ];
+				availableDeviceIds.push( deviceId );
+			});
 			deviceIdToSocket[ deviceId ] = ws;
 			obsSock.subscribe( webSocketSubject );
 		}
@@ -70,7 +77,6 @@ router.ws('/ws/', function(ws, req) {
 
 // listen to webSocket events
 webSocketSubject.subscribe( function( e ) {
-	console.log( "inside constantly subject" );
 	console.log( e.data );
 }, function (error) {
 	console.log('ERROR!');
@@ -83,22 +89,26 @@ udpServer.on('error', function(error) {
 });
 
 udpServer.on('message', function(message, rinfo) {
-	console.log('Broadcast message: ' + rinfo.address + ':' + rinfo.port + ')');
-	
 	var responseObject = {};
 	responseObject['port'] = WS_LISTENING_PORT;
 	responseObject['path'] = 'device/ws';
-	responseObject['id'] = Object.keys(deviceIdToSocket).length + 1;
+
+	// assign unique ID
+	if( availableDeviceIds.length < 1 ) {
+		deviceIdPointer += 1;
+		responseObject['id'] = deviceIdPointer;
+	} else {
+		var availableId = availableDeviceIds.pop();
+		responseObject['id'] = availableId;
+	}
 
 	responseMessage = JSON.stringify(responseObject);
 
-	setTimeout( function() {
-		udpServer.send( responseMessage, 0, responseMessage.length, rinfo.port, rinfo.address, function( err, bytes ) {
-			if( err ) {
-				throw err;
-			}
-		});
-	}, 200);
+	udpServer.send( responseMessage, 0, responseMessage.length, rinfo.port, rinfo.address, function( err, bytes ) {
+		if( err ) {
+			throw err;
+		}
+	});
 });
 udpServer.on('listening', function() {
 	var address = udpServer.address();
